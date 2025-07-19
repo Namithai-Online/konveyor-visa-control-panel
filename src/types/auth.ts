@@ -1,7 +1,6 @@
 export interface LoginCredentials {
-  client_id: string;
-  client_secret: string;
-  grant_type: 'client_credentials';
+  email: string;
+  password: string;
 }
 
 export interface AuthResponse {

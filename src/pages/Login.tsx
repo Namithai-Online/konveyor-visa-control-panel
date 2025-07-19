@@ -10,11 +10,10 @@ import { Shield, Eye, EyeOff } from 'lucide-react';
 
 const Login: React.FC = () => {
   const [credentials, setCredentials] = useState({
-    client_id: '',
-    client_secret: '',
-    grant_type: 'client_credentials' as const
+    email: '',
+    password: ''
   });
-  const [showSecret, setShowSecret] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
   const { login } = useAuth();
@@ -45,9 +44,8 @@ const Login: React.FC = () => {
 
   const fillDemoCredentials = () => {
     setCredentials({
-      client_id: 'demo_client_id',
-      client_secret: 'demo_client_secret',
-      grant_type: 'client_credentials'
+      email: 'demo@example.com',
+      password: 'demo_password'
     });
   };
 
@@ -66,26 +64,26 @@ const Login: React.FC = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="client_id">Client ID</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="client_id"
-                type="text"
-                value={credentials.client_id}
-                onChange={(e) => setCredentials({...credentials, client_id: e.target.value})}
-                placeholder="Enter your client ID"
+                id="email"
+                type="email"
+                value={credentials.email}
+                onChange={(e) => setCredentials({...credentials, email: e.target.value})}
+                placeholder="Enter your email"
                 required
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="client_secret">Client Secret</Label>
+              <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <Input
-                  id="client_secret"
-                  type={showSecret ? "text" : "password"}
-                  value={credentials.client_secret}
-                  onChange={(e) => setCredentials({...credentials, client_secret: e.target.value})}
-                  placeholder="Enter your client secret"
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={credentials.password}
+                  onChange={(e) => setCredentials({...credentials, password: e.target.value})}
+                  placeholder="Enter your password"
                   required
                 />
                 <Button
@@ -93,9 +91,9 @@ const Login: React.FC = () => {
                   variant="ghost"
                   size="sm"
                   className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                  onClick={() => setShowSecret(!showSecret)}
+                  onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showSecret ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
             </div>
