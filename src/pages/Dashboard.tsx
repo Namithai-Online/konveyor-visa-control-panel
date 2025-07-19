@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { DataTable, DataTableColumn, DataTableAction } from '@/components/ui/data-table';
 import { mockOrders, mockSystemHealth, mockCountries, mockVisaTypes } from '@/data/mockData';
 import { FileText, Users, Clock, CheckCircle, XCircle, Activity, TrendingUp, Globe, CreditCard, AlertTriangle, Plus, Eye, UploadCloud } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -35,6 +36,72 @@ const Dashboard: React.FC = () => {
       case 'rejected': return 'bg-destructive text-destructive-foreground';
       default: return 'bg-muted text-muted-foreground';
     }
+  };
+
+  // Recent Applications DataTable Component
+  const RecentApplicationsTable = () => {
+    const recentOrders = mockOrders.slice(0, 5);
+
+    const recentColumns: DataTableColumn<typeof mockOrders[0]>[] = [
+      {
+        key: 'order_id',
+        header: 'Order ID',
+        cell: (order) => <span className="font-medium font-mono text-sm">{order.order_id}</span>
+      },
+      {
+        key: 'applicant',
+        header: 'Applicant',
+        cell: (order) => (
+          <div>
+            <div className="font-medium text-sm">
+              {order.applicant?.first_name} {order.applicant?.last_name}
+            </div>
+            <div className="text-xs text-muted-foreground">{getDestinationCountry(order.visa_type_id)}</div>
+          </div>
+        )
+      },
+      {
+        key: 'status',
+        header: 'Status',
+        cell: (order) => (
+          <Badge className={getStatusColor(order.status)} variant="outline">
+            {order.status.replace('_', ' ')}
+          </Badge>
+        )
+      },
+      {
+        key: 'created_at',
+        header: 'Created',
+        cell: (order) => (
+          <span className="text-sm text-muted-foreground">
+            {new Date(order.created_at).toLocaleDateString()}
+          </span>
+        )
+      }
+    ];
+
+    const recentActions: DataTableAction<typeof mockOrders[0]>[] = [
+      {
+        label: 'View Details',
+        icon: <Eye className="h-4 w-4" />,
+        onClick: (order) => navigate(`/orders/${order.order_id}`),
+        variant: 'ghost'
+      }
+    ];
+
+    return (
+      <div className="p-6">
+        <DataTable
+          data={recentOrders}
+          columns={recentColumns}
+          title=""
+          searchKeys={[]}
+          actions={recentActions}
+          emptyMessage="No recent applications"
+          emptyDescription="No applications have been submitted recently."
+        />
+      </div>
+    );
   };
 
   return (
@@ -199,47 +266,22 @@ const Dashboard: React.FC = () => {
 
       {/* Recent Activity & Orders */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle>Recent Applications</CardTitle>
-              <CardDescription>Latest visa application submissions</CardDescription>
-            </div>
-            <Button variant="outline" size="sm" onClick={() => navigate('/orders')}>
-              View All
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {mockOrders.slice(0, 5).map((order) => (
-                <div key={order.order_id} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/50 hover:bg-muted/50 transition-colors cursor-pointer" onClick={() => navigate(`/orders/${order.order_id}`)}>
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <FileText className="h-4 w-4 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{order.order_id}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {order.applicant?.first_name} {order.applicant?.last_name}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {getDestinationCountry(order.visa_type_id)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Badge className={getStatusColor(order.status)}>
-                      {order.status.replace('_', ' ')}
-                    </Badge>
-                    <span className="text-sm text-muted-foreground">
-                      {new Date(order.created_at).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="lg:col-span-2">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Recent Applications</CardTitle>
+                <CardDescription>Latest visa application submissions</CardDescription>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => navigate('/orders')}>
+                View All
+              </Button>
+            </CardHeader>
+            <CardContent className="p-0">
+              <RecentApplicationsTable />
+            </CardContent>
+          </Card>
+        </div>
 
         <Card>
           <CardHeader>
