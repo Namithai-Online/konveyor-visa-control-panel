@@ -28,7 +28,7 @@ const menuItems = [
   { title: 'Create Order', url: '/orders/create', icon: Plus },
   { title: 'Documents', url: '/documents', icon: Upload },
   { title: 'Countries & Visas', url: '/countries', icon: Globe },
-  { title: 'Wizard Flow', url: '/wizard', icon: Workflow },
+  { title: 'Apply Visa', url: '/wizard', icon: Workflow },
 ];
 
 export const AdminSidebar: React.FC = () => {
