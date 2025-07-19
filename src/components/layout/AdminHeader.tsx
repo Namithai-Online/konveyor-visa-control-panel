@@ -24,7 +24,7 @@ export const AdminHeader: React.FC = () => {
     <header className="h-16 border-b border-border bg-admin-header flex items-center justify-between px-6">
       <div className="flex items-center gap-4">
         <SidebarTrigger />
-        <h1 className="text-xl font-semibold">Admin Panel</h1>
+        <h1 className="text-xl font-semibold">EZVisaPro</h1>
       </div>
 
       <div className="flex items-center gap-4">

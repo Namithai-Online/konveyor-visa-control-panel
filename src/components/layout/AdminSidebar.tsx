@@ -52,7 +52,7 @@ export const AdminSidebar: React.FC = () => {
             </div>
             {!isCollapsed && (
               <div>
-                <h2 className="font-bold text-lg">SMV Konveyor</h2>
+                <h2 className="font-bold text-lg">EZVisaPro</h2>
                 <p className="text-xs text-muted-foreground">Admin Panel</p>
               </div>
             )}

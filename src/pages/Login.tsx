@@ -29,7 +29,7 @@ const Login: React.FC = () => {
       await login(credentials);
       toast({
         title: "Login successful",
-        description: "Welcome to SMV Konveyor Admin Panel",
+        description: "Welcome to EZVisaPro Admin Panel",
       });
       navigate('/dashboard');
     } catch (error) {
@@ -60,7 +60,7 @@ const Login: React.FC = () => {
               <Shield className="h-8 w-8 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">SMV Konveyor</CardTitle>
+          <CardTitle className="text-2xl font-bold">EZVisaPro</CardTitle>
           <CardDescription>Admin Panel Access</CardDescription>
         </CardHeader>
         <CardContent>
