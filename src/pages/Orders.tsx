@@ -1,34 +1,14 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { DataTable, DataTableColumn, DataTableAction } from '@/components/ui/data-table';
 import { mockOrders } from '@/data/mockData';
-import { Search, Eye, Plus, Filter } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+import { Eye, Edit, Trash2, Plus, Clock, CheckCircle, XCircle, Activity } from 'lucide-react';
 
 const Orders: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
   const navigate = useNavigate();
-
-  const filteredOrders = mockOrders.filter(order => {
-    const matchesSearch = order.order_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      `${order.applicant?.first_name} ${order.applicant?.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.applicant?.email.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
-  });
+  const { toast } = useToast();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -40,112 +20,136 @@ const Orders: React.FC = () => {
     }
   };
 
-  const handleViewOrder = (orderId: string) => {
-    navigate(`/orders/${orderId}`);
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'pending': return <Clock className="h-3 w-3" />;
+      case 'in_progress': return <Activity className="h-3 w-3" />;
+      case 'completed': return <CheckCircle className="h-3 w-3" />;
+      case 'rejected': return <XCircle className="h-3 w-3" />;
+      default: return <Clock className="h-3 w-3" />;
+    }
   };
 
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+  const orderColumns: DataTableColumn<typeof mockOrders[0]>[] = [
+    {
+      key: 'order_id',
+      header: 'Order ID',
+      cell: (order) => <span className="font-medium font-mono">{order.order_id}</span>
+    },
+    {
+      key: 'applicant',
+      header: 'Applicant',
+      cell: (order) => (
         <div>
-          <h1 className="text-3xl font-bold">Orders</h1>
-          <p className="text-muted-foreground">Manage visa application orders</p>
-        </div>
-        <Button onClick={() => navigate('/orders/create')} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Create Order
-        </Button>
-      </div>
-
-      {/* Search and Filter */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Search & Filter</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Search by order ID, name, or email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border rounded-md bg-background"
-            >
-              <option value="all">All Status</option>
-              <option value="pending">Pending</option>
-              <option value="in_progress">In Progress</option>
-              <option value="completed">Completed</option>
-              <option value="rejected">Rejected</option>
-            </select>
+          <div className="font-medium">
+            {order.applicant?.first_name} {order.applicant?.last_name}
           </div>
-        </CardContent>
-      </Card>
+          <div className="text-sm text-muted-foreground">{order.applicant?.email}</div>
+        </div>
+      )
+    },
+    {
+      key: 'visa_type_id',
+      header: 'Visa Type',
+      cell: (order) => (
+        <Badge variant="outline">{order.visa_type_id || 'N/A'}</Badge>
+      )
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      cell: (order) => (
+        <div className="flex items-center gap-2">
+          {getStatusIcon(order.status)}
+          <Badge className={getStatusColor(order.status)}>
+            {order.status.replace('_', ' ')}
+          </Badge>
+        </div>
+      )
+    },
+    {
+      key: 'created_at',
+      header: 'Created',
+      cell: (order) => (
+        <div className="text-sm">
+          {new Date(order.created_at).toLocaleDateString()}
+          <div className="text-xs text-muted-foreground">
+            {new Date(order.created_at).toLocaleTimeString()}
+          </div>
+        </div>
+      )
+    },
+    {
+      key: 'travel_date',
+      header: 'Travel Date',
+      cell: (order) => (
+        <span className="text-sm">
+          {order.travel_date ? new Date(order.travel_date).toLocaleDateString() : '-'}
+        </span>
+      )
+    }
+  ];
 
-      {/* Orders Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Orders ({filteredOrders.length})</CardTitle>
-          <CardDescription>List of all visa application orders</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Order ID</TableHead>
-                <TableHead>Applicant</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead>Travel Date</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredOrders.map((order) => (
-                <TableRow key={order.order_id}>
-                  <TableCell className="font-medium">{order.order_id}</TableCell>
-                  <TableCell>
-                    {order.applicant?.first_name} {order.applicant?.last_name}
-                  </TableCell>
-                  <TableCell>{order.applicant?.email}</TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(order.status)}>
-                      {order.status.replace('_', ' ')}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{new Date(order.created_at).toLocaleDateString()}</TableCell>
-                  <TableCell>{order.travel_date ? new Date(order.travel_date).toLocaleDateString() : '-'}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleViewOrder(order.order_id)}
-                      className="flex items-center gap-1"
-                    >
-                      <Eye className="h-4 w-4" />
-                      View
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          
-          {filteredOrders.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground">
-              No orders found matching your criteria.
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+  const orderActions: DataTableAction<typeof mockOrders[0]>[] = [
+    {
+      label: 'View Details',
+      icon: <Eye className="h-4 w-4" />,
+      onClick: (order) => navigate(`/orders/${order.order_id}`),
+      variant: 'ghost'
+    },
+    {
+      label: 'Edit',
+      icon: <Edit className="h-4 w-4" />,
+      onClick: (order) => {
+        toast({
+          title: "Edit Order",
+          description: `Edit functionality for order ${order.order_id} would be implemented here.`,
+        });
+      },
+      variant: 'ghost'
+    },
+    {
+      label: 'Delete',
+      icon: <Trash2 className="h-4 w-4" />,
+      onClick: (order) => {
+        toast({
+          title: "Delete Order",
+          description: `Delete functionality for order ${order.order_id} would be implemented here.`,
+          variant: "destructive",
+        });
+      },
+      variant: 'destructive'
+    }
+  ];
+
+  const statusOptions = [
+    { value: 'pending', label: 'Pending' },
+    { value: 'in_progress', label: 'In Progress' },
+    { value: 'completed', label: 'Completed' },
+    { value: 'rejected', label: 'Rejected' }
+  ];
+
+  return (
+    <DataTable
+      data={mockOrders}
+      columns={orderColumns}
+      title="Visa Orders"
+      description="Manage visa application orders and track their progress"
+      searchPlaceholder="Search by order ID, name, or email..."
+      searchKeys={['order_id', 'applicant']}
+      filters={[
+        {
+          key: 'status',
+          label: 'Status',
+          options: statusOptions
+        }
+      ]}
+      actions={orderActions}
+      onAdd={() => navigate('/orders/create')}
+      addButtonLabel="Create Order"
+      emptyMessage="No orders found"
+      emptyDescription="No orders match your current criteria."
+    />
   );
 };
 

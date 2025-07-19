@@ -1,27 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { DataTable, DataTableColumn, DataTableAction } from '@/components/ui/data-table';
 import { mockDocuments, mockOrders } from '@/data/mockData';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Search, Eye, Download, CheckCircle, Clock, XCircle, Plus, Filter } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { FileText, Search, Eye, Download, CheckCircle, Clock, XCircle, Plus, Edit, Trash2 } from 'lucide-react';
 
 const Documents: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [orderFilter, setOrderFilter] = useState('all');
   const navigate = useNavigate();
-
-  const filteredDocuments = mockDocuments.filter(doc => {
-    const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doc.document_id.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' || doc.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
-  });
+  const { toast } = useToast();
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -52,21 +41,118 @@ const Documents: React.FC = () => {
 
   const stats = getDocumentStats();
 
+  const documentColumns: DataTableColumn<typeof mockDocuments[0]>[] = [
+    {
+      key: 'document_id',
+      header: 'Document ID',
+      cell: (doc) => <span className="font-mono text-sm">{doc.document_id}</span>
+    },
+    {
+      key: 'name',
+      header: 'Document Name',
+      cell: (doc) => (
+        <div className="flex items-center gap-2">
+          <FileText className="h-4 w-4 text-muted-foreground" />
+          <span className="font-medium">{doc.name}</span>
+        </div>
+      )
+    },
+    {
+      key: 'doc_type',
+      header: 'Type',
+      cell: (doc) => (
+        <Badge variant="outline" className="capitalize">
+          {doc.doc_type?.replace('_', ' ') || 'General'}
+        </Badge>
+      )
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      cell: (doc) => (
+        <div className="flex items-center gap-2">
+          {getStatusIcon(doc.status)}
+          <Badge className={getStatusColor(doc.status)}>
+            {doc.status}
+          </Badge>
+        </div>
+      )
+    },
+    {
+      key: 'upload_date',
+      header: 'Upload Date',
+      cell: () => (
+        <span className="text-sm text-muted-foreground">
+          {new Date().toLocaleDateString()}
+        </span>
+      )
+    }
+  ];
+
+  const documentActions: DataTableAction<typeof mockDocuments[0]>[] = [
+    {
+      label: 'View',
+      icon: <Eye className="h-4 w-4" />,
+      onClick: (doc) => {
+        toast({
+          title: "View Document",
+          description: `Opening document: ${doc.name}`,
+        });
+      },
+      variant: 'ghost'
+    },
+    {
+      label: 'Download',
+      icon: <Download className="h-4 w-4" />,
+      onClick: (doc) => {
+        toast({
+          title: "Download Started",
+          description: `Downloading ${doc.name}...`,
+        });
+      },
+      variant: 'ghost'
+    },
+    {
+      label: 'Edit',
+      icon: <Edit className="h-4 w-4" />,
+      onClick: (doc) => {
+        toast({
+          title: "Edit Document",
+          description: `Edit functionality for ${doc.name} would be implemented here.`,
+        });
+      },
+      variant: 'ghost'
+    },
+    {
+      label: 'Delete',
+      icon: <Trash2 className="h-4 w-4" />,
+      onClick: (doc) => {
+        toast({
+          title: "Delete Document",
+          description: `Delete functionality for ${doc.name} would be implemented here.`,
+          variant: "destructive",
+        });
+      },
+      variant: 'destructive'
+    }
+  ];
+
+  const statusOptions = [
+    { value: 'uploaded', label: 'Pending' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'rejected', label: 'Rejected' }
+  ];
+
+  const typeOptions = [
+    { value: 'passport', label: 'Passport' },
+    { value: 'photo', label: 'Photo' },
+    { value: 'financial', label: 'Financial' },
+    { value: 'insurance', label: 'Insurance' },
+    { value: 'itinerary', label: 'Itinerary' }
+  ];
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold">Document Management</h1>
-          <p className="text-muted-foreground">
-            View and manage documents from visa applications
-          </p>
-        </div>
-        <Button onClick={() => navigate('/wizard')} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          New Application
-        </Button>
-      </div>
-
       {/* Document Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
@@ -114,117 +200,32 @@ const Documents: React.FC = () => {
         </Card>
       </div>
 
-      {/* Search and Filter */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            Search & Filter
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Search by document name or ID..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="uploaded">Pending</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={orderFilter} onValueChange={setOrderFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by order" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Orders</SelectItem>
-                {mockOrders.map((order) => (
-                  <SelectItem key={order.order_id} value={order.order_id}>
-                    {order.order_id}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Documents List */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
-            Documents ({filteredDocuments.length})
-          </CardTitle>
-          <CardDescription>
-            All documents from visa applications with their current status
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {filteredDocuments.map((doc) => (
-              <div key={doc.document_id} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/50 hover:bg-muted/50 transition-colors">
-                <div className="flex items-center gap-4">
-                  {getStatusIcon(doc.status)}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3">
-                      <h4 className="font-medium">{doc.name}</h4>
-                      <Badge className={getStatusColor(doc.status)}>
-                        {doc.status}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-                      <span>ID: {doc.document_id}</span>
-                      {doc.doc_type && (
-                        <span className="capitalize">Type: {doc.doc_type.replace('_', ' ')}</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                    <Eye className="h-4 w-4" />
-                    View
-                  </Button>
-                  <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                    <Download className="h-4 w-4" />
-                    Download
-                  </Button>
-                </div>
-              </div>
-            ))}
-            
-            {filteredDocuments.length === 0 && (
-              <div className="text-center py-12">
-                <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-                <h3 className="text-lg font-medium mb-2">No documents found</h3>
-                <p className="text-muted-foreground mb-4">
-                  {searchTerm || statusFilter !== 'all' 
-                    ? 'No documents match your current filters.' 
-                    : 'No documents have been uploaded yet.'}
-                </p>
-                <Button onClick={() => navigate('/wizard')} className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Start New Application
-                </Button>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Documents Table */}
+      <DataTable
+        data={mockDocuments}
+        columns={documentColumns}
+        title="Document Management"
+        description="View and manage documents from visa applications"
+        searchPlaceholder="Search by document name or ID..."
+        searchKeys={['name', 'document_id']}
+        filters={[
+          {
+            key: 'status',
+            label: 'Status',
+            options: statusOptions
+          },
+          {
+            key: 'doc_type',
+            label: 'Type',
+            options: typeOptions
+          }
+        ]}
+        actions={documentActions}
+        onAdd={() => navigate('/wizard')}
+        addButtonLabel="New Application"
+        emptyMessage="No documents found"
+        emptyDescription="No documents match your current criteria."
+      />
 
       {/* Information Panel */}
       <Card>
