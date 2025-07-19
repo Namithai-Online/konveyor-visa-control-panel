@@ -2,20 +2,26 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { mockDocuments, mockOrders } from '@/data/mockData';
-import { useToast } from '@/hooks/use-toast';
-import { Upload, FileText, CheckCircle, Clock, XCircle, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { FileText, Search, Eye, Download, CheckCircle, Clock, XCircle, Plus, Filter } from 'lucide-react';
 
 const Documents: React.FC = () => {
-  const [selectedOrder, setSelectedOrder] = useState('');
-  const [uploadFiles, setUploadFiles] = useState<File[]>([]);
-  const [docType, setDocType] = useState('');
-  const [isUploading, setIsUploading] = useState(false);
-  const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [orderFilter, setOrderFilter] = useState('all');
+  const navigate = useNavigate();
+
+  const filteredDocuments = mockDocuments.filter(doc => {
+    const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doc.document_id.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = statusFilter === 'all' || doc.status === statusFilter;
+    
+    return matchesSearch && matchesStatus;
+  });
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -35,236 +41,230 @@ const Documents: React.FC = () => {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setUploadFiles(files);
+  const getDocumentStats = () => {
+    const total = mockDocuments.length;
+    const approved = mockDocuments.filter(doc => doc.status === 'approved').length;
+    const pending = mockDocuments.filter(doc => doc.status === 'uploaded').length;
+    const rejected = mockDocuments.filter(doc => doc.status === 'rejected').length;
+    
+    return { total, approved, pending, rejected };
   };
 
-  const handleSingleUpload = async () => {
-    if (!selectedOrder || !uploadFiles.length || !docType) {
-      toast({
-        title: "Missing information",
-        description: "Please select an order, document type, and file to upload.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsUploading(true);
-    try {
-      // Mock upload
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast({
-        title: "Document uploaded successfully",
-        description: `${uploadFiles[0].name} has been uploaded for order ${selectedOrder}.`,
-      });
-      
-      setUploadFiles([]);
-      setDocType('');
-    } catch (error) {
-      toast({
-        title: "Upload failed",
-        description: "There was an error uploading the document.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleBulkUpload = async () => {
-    if (!selectedOrder || !uploadFiles.length) {
-      toast({
-        title: "Missing information",
-        description: "Please select an order and files to upload.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsUploading(true);
-    try {
-      // Mock bulk upload
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      toast({
-        title: "Bulk upload completed",
-        description: `${uploadFiles.length} documents uploaded for order ${selectedOrder}.`,
-      });
-      
-      setUploadFiles([]);
-    } catch (error) {
-      toast({
-        title: "Bulk upload failed",
-        description: "There was an error with the bulk upload.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsUploading(false);
-    }
-  };
+  const stats = getDocumentStats();
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Documents</h1>
-        <p className="text-muted-foreground">Manage document uploads and status</p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold">Document Management</h1>
+          <p className="text-muted-foreground">
+            View and manage documents from visa applications
+          </p>
+        </div>
+        <Button onClick={() => navigate('/wizard')} className="flex items-center gap-2">
+          <Plus className="h-4 w-4" />
+          New Application
+        </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Upload Section */}
-        <div className="space-y-6">
-          {/* Single Upload */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Upload className="h-5 w-5" />
-                Single Document Upload
-              </CardTitle>
-              <CardDescription>Upload a single document for an order</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="order-select">Select Order</Label>
-                <Select value={selectedOrder} onValueChange={setSelectedOrder}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choose an order" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {mockOrders.map((order) => (
-                      <SelectItem key={order.order_id} value={order.order_id}>
-                        {order.order_id} - {order.applicant?.first_name} {order.applicant?.last_name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="doc-type">Document Type</Label>
-                <Select value={docType} onValueChange={setDocType}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select document type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="passport">Passport Copy</SelectItem>
-                    <SelectItem value="photo">Passport Photo</SelectItem>
-                    <SelectItem value="financial">Financial Documents</SelectItem>
-                    <SelectItem value="insurance">Travel Insurance</SelectItem>
-                    <SelectItem value="itinerary">Travel Itinerary</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="file-upload">Select File</Label>
-                <Input
-                  id="file-upload"
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                  onChange={handleFileChange}
-                  className="cursor-pointer"
-                />
-              </div>
-
-              <Button 
-                onClick={handleSingleUpload}
-                disabled={isUploading || !selectedOrder || !uploadFiles.length || !docType}
-                className="w-full"
-              >
-                {isUploading ? 'Uploading...' : 'Upload Document'}
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Bulk Upload */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Plus className="h-5 w-5" />
-                Bulk Document Upload
-              </CardTitle>
-              <CardDescription>Upload multiple documents at once</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="bulk-order-select">Select Order</Label>
-                <Select value={selectedOrder} onValueChange={setSelectedOrder}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choose an order" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {mockOrders.map((order) => (
-                      <SelectItem key={order.order_id} value={order.order_id}>
-                        {order.order_id} - {order.applicant?.first_name} {order.applicant?.last_name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="bulk-file-upload">Select Multiple Files</Label>
-                <Input
-                  id="bulk-file-upload"
-                  type="file"
-                  multiple
-                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                  onChange={handleFileChange}
-                  className="cursor-pointer"
-                />
-                {uploadFiles.length > 0 && (
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {uploadFiles.length} file(s) selected
-                  </p>
-                )}
-              </div>
-
-              <Button 
-                onClick={handleBulkUpload}
-                disabled={isUploading || !selectedOrder || !uploadFiles.length}
-                className="w-full"
-              >
-                {isUploading ? 'Uploading...' : `Upload ${uploadFiles.length} Documents`}
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Documents List */}
+      {/* Document Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Document Status
-            </CardTitle>
-            <CardDescription>Overview of all uploaded documents</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Documents</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {mockDocuments.map((doc) => (
-                <div key={doc.document_id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    {getStatusIcon(doc.status)}
-                    <div>
-                      <p className="font-medium">{doc.name}</p>
-                      <p className="text-sm text-muted-foreground">ID: {doc.document_id}</p>
-                      {doc.doc_type && (
-                        <p className="text-xs text-muted-foreground capitalize">{doc.doc_type}</p>
-                      )}
-                    </div>
-                  </div>
-                  <Badge className={getStatusColor(doc.status)}>
-                    {doc.status}
-                  </Badge>
-                </div>
-              ))}
-            </div>
+            <div className="text-2xl font-bold">{stats.total}</div>
+            <p className="text-xs text-muted-foreground">All uploaded documents</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Pending Review</CardTitle>
+            <Clock className="h-4 w-4 text-warning" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.pending}</div>
+            <p className="text-xs text-muted-foreground">Awaiting review</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Approved</CardTitle>
+            <CheckCircle className="h-4 w-4 text-success" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.approved}</div>
+            <p className="text-xs text-muted-foreground">Successfully approved</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Rejected</CardTitle>
+            <XCircle className="h-4 w-4 text-destructive" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.rejected}</div>
+            <p className="text-xs text-muted-foreground">Require resubmission</p>
           </CardContent>
         </Card>
       </div>
+
+      {/* Search and Filter */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Filter className="h-5 w-5" />
+            Search & Filter
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Search by document name or ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="uploaded">Pending</SelectItem>
+                <SelectItem value="approved">Approved</SelectItem>
+                <SelectItem value="rejected">Rejected</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={orderFilter} onValueChange={setOrderFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter by order" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Orders</SelectItem>
+                {mockOrders.map((order) => (
+                  <SelectItem key={order.order_id} value={order.order_id}>
+                    {order.order_id}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Documents List */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            Documents ({filteredDocuments.length})
+          </CardTitle>
+          <CardDescription>
+            All documents from visa applications with their current status
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {filteredDocuments.map((doc) => (
+              <div key={doc.document_id} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/50 hover:bg-muted/50 transition-colors">
+                <div className="flex items-center gap-4">
+                  {getStatusIcon(doc.status)}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3">
+                      <h4 className="font-medium">{doc.name}</h4>
+                      <Badge className={getStatusColor(doc.status)}>
+                        {doc.status}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                      <span>ID: {doc.document_id}</span>
+                      {doc.doc_type && (
+                        <span className="capitalize">Type: {doc.doc_type.replace('_', ' ')}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                    <Eye className="h-4 w-4" />
+                    View
+                  </Button>
+                  <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                    <Download className="h-4 w-4" />
+                    Download
+                  </Button>
+                </div>
+              </div>
+            ))}
+            
+            {filteredDocuments.length === 0 && (
+              <div className="text-center py-12">
+                <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                <h3 className="text-lg font-medium mb-2">No documents found</h3>
+                <p className="text-muted-foreground mb-4">
+                  {searchTerm || statusFilter !== 'all' 
+                    ? 'No documents match your current filters.' 
+                    : 'No documents have been uploaded yet.'}
+                </p>
+                <Button onClick={() => navigate('/wizard')} className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  Start New Application
+                </Button>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Information Panel */}
+      <Card>
+        <CardHeader>
+          <CardTitle>How Document Management Works</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-4 bg-primary/10 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Plus className="h-4 w-4 text-primary" />
+                <h4 className="font-semibold text-primary">Upload Documents</h4>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Documents are uploaded during the visa application wizard process.
+              </p>
+            </div>
+            
+            <div className="p-4 bg-warning/10 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="h-4 w-4 text-warning" />
+                <h4 className="font-semibold text-warning">Review Process</h4>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Uploaded documents are reviewed by our verification team.
+              </p>
+            </div>
+            
+            <div className="p-4 bg-success/10 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <CheckCircle className="h-4 w-4 text-success" />
+                <h4 className="font-semibold text-success">Approval & Processing</h4>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Approved documents proceed to visa processing stage.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
