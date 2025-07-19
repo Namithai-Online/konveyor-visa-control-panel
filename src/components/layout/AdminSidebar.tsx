@@ -39,21 +39,21 @@ export const AdminSidebar: React.FC = () => {
 
   const isActive = (path: string) => currentPath === path;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    isActive ? 'bg-primary text-primary-foreground font-medium' : 'hover:bg-accent';
+    isActive ? 'bg-sidebar-primary text-sidebar-primary-foreground font-medium' : 'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground';
 
   return (
     <Sidebar className={isCollapsed ? 'w-14' : 'w-64'} collapsible="icon">
-      <SidebarContent className="bg-admin-sidebar border-r border-border">
+      <SidebarContent className="bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
         {/* Logo Section */}
-        <div className="p-4 border-b border-border">
+        <div className="p-4 border-b border-sidebar-border">
           <div className="flex items-center gap-2">
             <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
               <Shield className="h-6 w-6 text-primary" />
             </div>
             {!isCollapsed && (
               <div>
-                <h2 className="font-bold text-lg">EZVisaPro</h2>
-                <p className="text-xs text-muted-foreground">Admin Panel</p>
+                <h2 className="font-bold text-lg text-sidebar-foreground">EZVisaPro</h2>
+                <p className="text-xs text-sidebar-foreground/70">Admin Panel</p>
               </div>
             )}
           </div>
