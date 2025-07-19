@@ -740,34 +740,58 @@ const Wizard: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Steps Navigation */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex justify-between items-center overflow-x-auto">
+      {/* Modern Steps Navigation */}
+      <Card className="overflow-hidden">
+        <CardContent className="p-0">
+          <div className="flex">
             {steps.map((step, index) => (
-              <div key={step.number} className="flex items-center">
-                <div className={`flex items-center gap-2 ${
-                  step.number <= currentStep ? 'text-primary' : 'text-muted-foreground'
-                }`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${
-                    step.number < currentStep 
-                      ? 'bg-primary border-primary text-primary-foreground' 
-                      : step.number === currentStep
-                      ? 'border-primary bg-primary/10'
-                      : 'border-border'
+              <div 
+                key={step.number} 
+                className={`flex-1 relative ${
+                  step.number === currentStep 
+                    ? 'bg-primary text-primary-foreground' 
+                    : step.number < currentStep
+                    ? 'bg-primary/10 text-primary'
+                    : 'bg-muted/30 text-muted-foreground'
+                }`}
+              >
+                {/* Step Content */}
+                <div className="px-4 py-6 text-center">
+                  <div className={`inline-flex items-center justify-center w-10 h-10 rounded-full mb-3 ${
+                    step.number === currentStep
+                      ? 'bg-primary-foreground text-primary'
+                      : step.number < currentStep
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-background text-muted-foreground border border-border'
                   }`}>
                     {step.number < currentStep ? (
-                      <CheckCircle className="h-4 w-4" />
+                      <CheckCircle className="h-5 w-5" />
                     ) : (
-                      <step.icon className="h-4 w-4" />
+                      <step.icon className="h-5 w-5" />
                     )}
                   </div>
-                  <span className="text-sm font-medium hidden md:inline">{step.title}</span>
+                  <div className="space-y-1">
+                    <h3 className="font-semibold text-sm">{step.title}</h3>
+                    <p className={`text-xs ${
+                      step.number === currentStep ? 'text-primary-foreground/80' : 'text-muted-foreground'
+                    }`}>
+                      {step.number === currentStep ? 'Current Step' : 
+                       step.number < currentStep ? 'Completed' : 'Pending'}
+                    </p>
+                  </div>
                 </div>
+
+                {/* Connecting Line */}
                 {index < steps.length - 1 && (
-                  <div className={`w-8 h-0.5 mx-2 ${
-                    step.number < currentStep ? 'bg-primary' : 'bg-border'
-                  }`} />
+                  <div className="absolute top-1/2 right-0 transform -translate-y-1/2 translate-x-1/2 z-10">
+                    <div className={`w-6 h-6 rotate-45 border-r border-b ${
+                      step.number < currentStep 
+                        ? 'bg-primary border-primary' 
+                        : step.number === currentStep
+                        ? 'bg-primary border-primary'
+                        : 'bg-muted/30 border-border'
+                    }`} />
+                  </div>
                 )}
               </div>
             ))}
