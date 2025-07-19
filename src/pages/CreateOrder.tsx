@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -6,15 +6,6 @@ import { ArrowLeft, ArrowRight, Zap, FileText, Upload, User, CreditCard, CheckCi
 
 const CreateOrder: React.FC = () => {
   const navigate = useNavigate();
-
-  // Auto-redirect to wizard after 3 seconds, or let user click to go immediately
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      navigate('/wizard');
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [navigate]);
 
   const wizardSteps = [
     { icon: FileText, title: 'Country & Visa Selection', description: 'Choose destination and visa type' },
@@ -79,7 +70,7 @@ const CreateOrder: React.FC = () => {
                 size="lg"
               >
                 <ArrowRight className="h-4 w-4" />
-                Start Wizard Now
+                Apply Now - Start Wizard
               </Button>
               <Button 
                 variant="outline"
@@ -91,7 +82,7 @@ const CreateOrder: React.FC = () => {
             </div>
             
             <p className="text-xs text-muted-foreground">
-              You will be automatically redirected to the wizard in a few seconds...
+              Click "Apply Now" to begin your visa application process
             </p>
           </div>
         </CardContent>
