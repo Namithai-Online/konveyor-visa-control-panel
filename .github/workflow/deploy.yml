@@ -1,9 +1,10 @@
+# .github/workflows/deploy.yml
 name: Deploy to GitHub Pages
 
 on:
   push:
     branches:
-      - main  # Change to 'master' if your default branch is named that
+      - main
 
 permissions:
   contents: write
