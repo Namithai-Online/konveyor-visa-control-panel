@@ -77,11 +77,11 @@ export const AdminSidebar: React.FC = () => {
                         fontSize: '0.875rem',
                         transition: 'all 0.2s',
                         textDecoration: 'none',
-                        color: isActive ? 'hsl(255 255 255)' : 'hsl(15 23 42)',
+                        color: isActive ? 'hsl(0 0% 100%)' : 'hsl(240 5.9% 10%)',
                         backgroundColor: isActive ? 'hsl(142 76% 36%)' : 'transparent',
                         fontWeight: isActive ? '500' : '400'
                       })}
-                      className="hover:!bg-slate-100 hover:!text-slate-800"
+                      className="hover:!bg-slate-50 hover:!text-slate-900"
                     >
                       <item.icon className="h-4 w-4" style={{ color: 'inherit' }} />
                       {!isCollapsed && <span style={{ color: 'inherit' }}>{item.title}</span>}
@@ -110,11 +110,11 @@ export const AdminSidebar: React.FC = () => {
                       fontSize: '0.875rem',
                       transition: 'all 0.2s',
                       textDecoration: 'none',
-                      color: isActive ? 'hsl(255 255 255)' : 'hsl(15 23 42)',
+                      color: isActive ? 'hsl(0 0% 100%)' : 'hsl(240 5.9% 10%)',
                       backgroundColor: isActive ? 'hsl(142 76% 36%)' : 'transparent',
                       fontWeight: isActive ? '500' : '400'
                     })}
-                    className="hover:!bg-slate-100 hover:!text-slate-800"
+                    className="hover:!bg-slate-50 hover:!text-slate-900"
                   >
                     <Settings className="h-4 w-4" style={{ color: 'inherit' }} />
                     {!isCollapsed && <span style={{ color: 'inherit' }}>Settings</span>}
