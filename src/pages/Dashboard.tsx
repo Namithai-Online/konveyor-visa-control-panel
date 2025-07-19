@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { mockOrders, mockSystemHealth, mockCountries, mockVisaTypes } from '@/data/mockData';
-import { FileText, Users, Clock, CheckCircle, XCircle, Activity, TrendingUp, Globe, CreditCard, AlertTriangle, Plus, Eye, Upload } from 'lucide-react';
+import { FileText, Users, Clock, CheckCircle, XCircle, Activity, TrendingUp, Globe, CreditCard, AlertTriangle, Plus, Eye, UploadCloud } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
@@ -116,7 +116,7 @@ const Dashboard: React.FC = () => {
               className="w-full justify-start"
               onClick={() => navigate('/documents')}
             >
-              <Upload className="h-4 w-4 mr-2" />
+              <UploadCloud className="h-4 w-4 mr-2" />
               Upload Documents
             </Button>
             <Button 
