@@ -66,7 +66,16 @@ export const AdminSidebar: React.FC = () => {
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={getNavCls}>
+                    <NavLink 
+                      to={item.url} 
+                      className={({ isActive }) => 
+                        `flex items-center gap-2 px-2 py-2 rounded-md text-sm transition-colors ${
+                          isActive 
+                            ? 'bg-sidebar-primary text-sidebar-primary-foreground font-medium' 
+                            : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+                        }`
+                      }
+                    >
                       <item.icon className="h-4 w-4" />
                       {!isCollapsed && <span>{item.title}</span>}
                     </NavLink>
@@ -83,7 +92,16 @@ export const AdminSidebar: React.FC = () => {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <NavLink to="/settings" className={getNavCls}>
+                  <NavLink 
+                    to="/settings" 
+                    className={({ isActive }) => 
+                      `flex items-center gap-2 px-2 py-2 rounded-md text-sm transition-colors ${
+                        isActive 
+                          ? 'bg-sidebar-primary text-sidebar-primary-foreground font-medium' 
+                          : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+                      }`
+                    }
+                  >
                     <Settings className="h-4 w-4" />
                     {!isCollapsed && <span>Settings</span>}
                   </NavLink>

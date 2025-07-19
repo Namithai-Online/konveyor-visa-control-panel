@@ -62,13 +62,13 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
-    --sidebar-background: 250 50% 98%;
-    --sidebar-foreground: 240 10% 20%;
+    --sidebar-background: 248 250 252;
+    --sidebar-foreground: 30 41 59;
     --sidebar-primary: 142 76% 36%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 92%;
-    --sidebar-accent-foreground: 240 10% 20%;
-    --sidebar-border: 240 5.9% 85%;
+    --sidebar-primary-foreground: 248 250 252;
+    --sidebar-accent: 241 245 249;
+    --sidebar-accent-foreground: 30 41 59;
+    --sidebar-border: 226 232 240;
     --sidebar-ring: 142 76% 36%;
   }
 
