@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAuth } from '@/contexts/AuthContext';
 import { Bell, User, LogOut, Settings } from 'lucide-react';
 
@@ -27,6 +28,9 @@ export const AdminHeader: React.FC = () => {
       </div>
 
       <div className="flex items-center gap-4">
+        {/* Theme Toggle */}
+        <ThemeToggle />
+
         {/* Notifications */}
         <Button variant="ghost" size="sm" className="relative">
           <Bell className="h-4 w-4" />
