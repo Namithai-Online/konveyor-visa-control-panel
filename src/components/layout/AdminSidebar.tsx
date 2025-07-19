@@ -68,16 +68,23 @@ export const AdminSidebar: React.FC = () => {
                   <SidebarMenuButton asChild>
                     <NavLink 
                       to={item.url} 
-                      className={({ isActive }) => 
-                        `flex items-center gap-2 px-2 py-2 rounded-md text-sm transition-colors ${
-                          isActive 
-                            ? 'bg-sidebar-primary text-sidebar-primary-foreground font-medium' 
-                            : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
-                        }`
-                      }
+                      style={({ isActive }) => ({
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        padding: '0.5rem',
+                        borderRadius: '0.375rem',
+                        fontSize: '0.875rem',
+                        transition: 'all 0.2s',
+                        textDecoration: 'none',
+                        color: isActive ? 'hsl(248 250 252)' : 'hsl(30 41 59)',
+                        backgroundColor: isActive ? 'hsl(142 76% 36%)' : 'transparent',
+                        fontWeight: isActive ? '500' : '400'
+                      })}
+                      className="hover:!bg-slate-100 hover:!text-slate-700"
                     >
-                      <item.icon className="h-4 w-4" />
-                      {!isCollapsed && <span>{item.title}</span>}
+                      <item.icon className="h-4 w-4" style={{ color: 'inherit' }} />
+                      {!isCollapsed && <span style={{ color: 'inherit' }}>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -94,16 +101,23 @@ export const AdminSidebar: React.FC = () => {
                 <SidebarMenuButton asChild>
                   <NavLink 
                     to="/settings" 
-                    className={({ isActive }) => 
-                      `flex items-center gap-2 px-2 py-2 rounded-md text-sm transition-colors ${
-                        isActive 
-                          ? 'bg-sidebar-primary text-sidebar-primary-foreground font-medium' 
-                          : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
-                      }`
-                    }
+                    style={({ isActive }) => ({
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      padding: '0.5rem',
+                      borderRadius: '0.375rem',
+                      fontSize: '0.875rem',
+                      transition: 'all 0.2s',
+                      textDecoration: 'none',
+                      color: isActive ? 'hsl(248 250 252)' : 'hsl(30 41 59)',
+                      backgroundColor: isActive ? 'hsl(142 76% 36%)' : 'transparent',
+                      fontWeight: isActive ? '500' : '400'
+                    })}
+                    className="hover:!bg-slate-100 hover:!text-slate-700"
                   >
-                    <Settings className="h-4 w-4" />
-                    {!isCollapsed && <span>Settings</span>}
+                    <Settings className="h-4 w-4" style={{ color: 'inherit' }} />
+                    {!isCollapsed && <span style={{ color: 'inherit' }}>Settings</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
