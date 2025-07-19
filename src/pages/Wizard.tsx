@@ -193,27 +193,56 @@ const Wizard: React.FC = () => {
               <p className="text-muted-foreground">Choose the country you plan to visit</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {mockCountries.map((country) => (
-                <Card 
-                  key={country.id} 
-                  className={`cursor-pointer transition-all hover:shadow-md ${
-                    orderData.country === country.id ? 'ring-2 ring-primary bg-primary/5' : ''
-                  }`}
-                  onClick={() => setOrderData(prev => ({ ...prev, country: country.id, visaType: '' }))}
-                >
-                  <CardContent className="p-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Destination Country</CardTitle>
+                <CardDescription>
+                  Select your travel destination from the list of available countries
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <Label htmlFor="country-select">Country *</Label>
+                  <Select 
+                    value={orderData.country}
+                    onValueChange={(value) => setOrderData(prev => ({ ...prev, country: value, visaType: '' }))}
+                  >
+                    <SelectTrigger id="country-select">
+                      <SelectValue placeholder="Select a destination country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {mockCountries.map((country) => (
+                        <SelectItem key={country.id} value={country.id}>
+                          <div className="flex items-center gap-2">
+                            <span>{country.emoji_flag}</span>
+                            <span>{country.name}</span>
+                            <span className="text-muted-foreground text-xs">({country.iso_code})</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {orderData.country && (
+                  <div className="mt-4 p-4 bg-primary/5 border border-primary/20 rounded-lg">
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl">{country.emoji_flag}</span>
+                      <span className="text-2xl">
+                        {mockCountries.find(c => c.id === orderData.country)?.emoji_flag}
+                      </span>
                       <div>
-                        <h3 className="font-semibold">{country.name}</h3>
-                        <p className="text-sm text-muted-foreground">ISO: {country.iso_code}</p>
+                        <p className="font-semibold">
+                          {mockCountries.find(c => c.id === orderData.country)?.name}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Selected destination country
+                        </p>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         );
 
