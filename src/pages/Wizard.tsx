@@ -723,7 +723,7 @@ const Wizard: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Visa Application Wizard</h1>
+        <h1 className="text-3xl font-bold">Visa Application WorkFlow</h1>
         <p className="text-muted-foreground">Complete your visa application step by step</p>
       </div>
 
