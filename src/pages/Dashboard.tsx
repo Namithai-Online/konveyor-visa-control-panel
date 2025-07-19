@@ -108,7 +108,7 @@ const Dashboard: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold">SMV Konveyor Dashboard</h1>
+          <h1 className="text-3xl font-bold">EZVisaPro Dashboard</h1>
           <p className="text-muted-foreground">Welcome back! Here's your visa processing overview</p>
         </div>
         <div className="flex gap-2">
